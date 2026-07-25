@@ -1,9 +1,10 @@
+import os
 import chromadb
-from sentence_transformers import SentenceTransformer
+from google import genai
+from dotenv import load_dotenv
 
-# Load the model that converts text into embeddings (numbers AI can search)
-print("Loading embedding model... (this may take a minute the first time)")
-model = SentenceTransformer('all-MiniLM-L6-v2')
+load_dotenv()
+client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
 # Read our writings file
 with open("data/my_writings.txt", "r", encoding="utf-8") as f:
@@ -13,19 +14,22 @@ with open("data/my_writings.txt", "r", encoding="utf-8") as f:
 entries = [e.strip() for e in content.split("\n\n") if e.strip()]
 print(f"Found {len(entries)} entries to process")
 
-# Set up ChromaDB (our vector database) - stores data in a local folder
+# Set up ChromaDB (our vector database)
 chroma_client = chromadb.PersistentClient(path="./chroma_db")
 
-# Create (or reset) our collection
 try:
     chroma_client.delete_collection(name="my_writings")
 except Exception:
     pass
 collection = chroma_client.create_collection(name="my_writings")
 
-# Convert each entry into an embedding and store it
-print("Creating embeddings and saving to database...")
-embeddings = model.encode(entries).tolist()
+# Get embeddings from Gemini's API instead of a local model
+print("Creating embeddings via Gemini API...")
+result = client.models.embed_content(
+    model="gemini-embedding-001",
+    contents=entries
+)
+embeddings = [e.values for e in result.embeddings]
 
 collection.add(
     documents=entries,
