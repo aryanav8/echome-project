@@ -5,10 +5,9 @@ from rag_engine import get_answer
 
 app = FastAPI()
 
-# Allow our React website (running on a different port) to talk to this server
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # default Vite/React dev server address
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -24,7 +23,8 @@ def root():
 def ask(payload: Question):
     result = get_answer(payload.question)
     return result
-    if __name__ == "__main__":
+
+if __name__ == "__main__":
     import uvicorn
     import os
     port = int(os.environ.get("PORT", 8000))
