@@ -33,7 +33,7 @@ function App() {
     <div className="app-container">
 <div className="header-block">
   <h1>EchoMe</h1>
-  <p className="subtitle">Ask a question, get an answer in your own voice</p>
+  <p className="subtitle">Ask a question, get an answer based on my real thoughts and opinions</p>
 </div>
 
       <div className="input-row">
